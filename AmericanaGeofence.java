@@ -1,0 +1,77 @@
+import java.lang.Math;
+
+public class AmericanaGeofence {
+
+    // Define the geofence for The Americana at Brand
+    // Using final for constants is a best practice for security and stability.
+    private static final double AMERICANA_LAT = 34.1465;
+    private static final double AMERICANA_LON = -118.2558;
+    private static final double GEOFENCE_RADIUS_METERS = 300.0; // 300-meter radius
+
+    public static void main(String[] args) {
+
+        // --- CODE MODIFICATION START ---
+        // We now check for command-line arguments instead of using a Scanner.
+
+        // 1. Validate that exactly two arguments are provided.
+        if (args.length != 2) {
+            // Print error message to the standard error stream.
+            System.err.println("Usage: java AmericanaGeofence <latitude> <longitude>");
+            System.err.println("Example: java AmericanaGeofence 34.1465 -118.2558");
+            System.exit(1); // Exit with a non-zero status code to indicate an error.
+        }
+
+        double userLat;
+        double userLon;
+
+        // 2. Parse the string arguments into doubles with error handling.
+        try {
+            userLat = Double.parseDouble(args[0]);
+            userLon = Double.parseDouble(args[1]);
+        } catch (NumberFormatException e) {
+            System.err.println("Error: Invalid coordinates. Please provide valid numbers for latitude and longitude.");
+            System.exit(1);
+            return; // Exit
+        }
+        // --- CODE MODIFICATION END ---
+
+        // Calculate the distance from the user's coordinates to the geofence center.
+        double distance = calculateDistance(userLat, userLon, AMERICANA_LAT, AMERICANA_LON);
+
+        // Display the result to the user.
+        System.out.println("Checking coordinates: Latitude=" + userLat + ", Longitude=" + userLon);
+        System.out.printf("Distance to The Americana at Brand: %.2f meters.%n", distance);
+
+        if (distance <= GEOFENCE_RADIUS_METERS) {
+            System.out.println("Result: Welcome! You are inside the geofence for The Americana at Brand.");
+        } else {
+            System.out.println("Result: You are outside the geofence for The Americana at Brand.");
+        }
+    }
+
+    /**
+     * Calculates the distance between two GPS coordinates in meters using the Haversine formula.
+     * This is a standard and reliable method for geodetic calculations.
+     *
+     * @param lat1 Latitude of point 1
+     * @param lon1 Longitude of point 1
+     * @param lat2 Latitude of point 2
+     * @param lon2 Longitude of point 2
+     * @return The distance in meters.
+     */
+    private static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // Radius of the Earth in kilometers
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        // Convert distance from kilometers to meters
+        return R * c * 1000;
+    }
+}
